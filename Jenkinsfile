@@ -3,7 +3,7 @@ pipeline {
     
     stages {
         stage ("build stage") {
-            step {
+            steps {
                 sh "mvn clean package -DskipTests=True"
                 archive "target/*.jar"
             }
