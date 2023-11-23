@@ -26,7 +26,7 @@ pipeline {
                 docker.withRegistry('https://registry.hub.docker.com', 'kumard31') {
                     sh 'printenv'
                     sh 'docker build -t kumard31/numeric-app:""$GIT_COMMIT"" .'
-                    sh 'docker push kumard31/numeric-app:""$GIT_COMMIT""'
+                    Image.push('kumard31/numeric-app:""$GIT_COMMIT""')
                 }
             }
         }
