@@ -1,4 +1,10 @@
 pipeline {
+    environment {
+        dockerImage = ''
+        registry = "kumard31/numeric-app"
+        registryCredential = kumard31
+    }
+
     agent any
     
     stages {
@@ -23,10 +29,10 @@ pipeline {
 
         stage ("docker build and push stage") {
             steps {
-                docker.withRegistry('https://registry.hub.docker.com', 'kumard31') {
+                docker.withRegistry('', 'kumard31') {
                     sh 'printenv'
-                    sh 'docker build -t kumard31/numeric-app:""$GIT_COMMIT"" .'
-                    Image.push('kumard31/numeric-app:""$GIT_COMMIT""')
+                    dockerImage = docker.build registry + ":$GIT_COMMIT"
+                    Image.push(registry + ":$GIT_COMMIT")
                 }
             }
         }
