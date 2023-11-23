@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -eo pipefail
 
 JENKINS_URL='http://localhost:8080'

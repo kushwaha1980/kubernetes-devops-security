@@ -1,12 +1,12 @@
 pipeline {
-  agent any
-
-  stages {
-      stage('Build Artifact') {
-            steps {
-              sh "mvn clean package -DskipTests=true"
-              archive 'target/*.jar' //so that they can be downloaded later
+    agent any
+    
+    stages {
+        stage ("build stage") {
+            step {
+                sh "mvn clean package -DskipTests=True"
+                archive "target/*.jar"
             }
-        }   
+        }
     }
 }
