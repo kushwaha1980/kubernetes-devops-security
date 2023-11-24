@@ -25,23 +25,32 @@ public class NumericController {
         @RestController
         public class compare {
 
-            @Test
-            public void smallerThanOrEqualToFiftyMessage() throws Exception {
-                this.mockMvc.perform(get("/compare/50")).andDo(print()).andExpect(status().isOk())
-                  .andExpect(content().string("Smaller than or equal to 50"));
-            }
-        
-            @Test
-            public void greaterThanFiftyMessage() throws Exception {
-                this.mockMvc.perform(get("/compare/51")).andDo(print()).andExpect(status().isOk())
-                        .andExpect(content().string("Greater than 50"));
-            }
-        
-            @Test
-            public void welcomeMessage() throws Exception {
-                 this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-                   .andExpect(content().string("Kubernetes DevSecOps"));
-            }
+                @GetMapping("/")
+                public void welcomeMessage() throws Exception {
+                    this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+                    .andExpect(content().string("Kubernetes DevSecOps"));
+                }
+
+                @GetMapping("/compare/{value}")
+                public void smallerThanOrEqualToFiftyMessage() throws Exception {
+                    this.mockMvc.perform(get("/compare/50")).andDo(print()).andExpect(status().isOk())
+                    .andExpect(content().string("Smaller than or equal to 50"));
+                }
+                
+                @GetMapping("/compare/{value}")
+                public void greaterThanFiftyMessage() throws Exception {
+                    this.mockMvc.perform(get("/compare/51")).andDo(print()).andExpect(status().isOk())
+                            .andExpect(content().string("Greater than 50"));
+                }
+
+                @GetMapping("/increment/{value}")
+                public int increment(@PathVariable int value) {
+                        ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseURL + '/' + value, String.class);
+                        String response = responseEntity.getBody();
+                        logger.info("Value Received in Request - " + value);
+                        logger.info("Node Service Response - " + response);
+                        return Integer.parseInt(response);
+                }
         }
 
 }
