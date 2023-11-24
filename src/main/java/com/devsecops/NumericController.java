@@ -17,40 +17,38 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class NumericController {
 
-        private final Logger logger = LoggerFactory.getLogger(getClass());
-        private static final String baseURL = "http://node-service:5000/plusone";
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final String baseURL = "http://node-service:5000/plusone";
+	
+	RestTemplate restTemplate = new RestTemplate();
+	
+	@RestController
+	public class compare {
 
-        RestTemplate restTemplate = new RestTemplate();
+		@GetMapping("/")
+		public String welcome() {
+			return "Kubernetes DevSecOps";
+		}
 
-        @RestController
-        public class compare {
+		@GetMapping("/compare/{value}")
+		public String compareToFifty(@PathVariable int value) {
+			String message = "Could not determine comparison";
+			if (value > 50) {
+				message = "Greater than 50";
+			} else {
+				message = "Smaller than or equal to 50";
+			}
+			return message;
+		}
 
-                @GetMapping("/")
-                public void welcomeMessage() throws Exception {
-                    this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-                    .andExpect(content().string("Kubernetes DevSecOps"));
-                }
-
-                @GetMapping("/compare/{value}")
-                public void smallerThanOrEqualToFiftyMessage() throws Exception {
-                    this.mockMvc.perform(get("/compare/50")).andDo(print()).andExpect(status().isOk())
-                    .andExpect(content().string("Smaller than or equal to 50"));
-                }
-                
-                @GetMapping("/compare/{value}")
-                public void greaterThanFiftyMessage() throws Exception {
-                    this.mockMvc.perform(get("/compare/51")).andDo(print()).andExpect(status().isOk())
-                            .andExpect(content().string("Greater than 50"));
-                }
-
-                @GetMapping("/increment/{value}")
-                public int increment(@PathVariable int value) {
-                        ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseURL + '/' + value, String.class);
-                        String response = responseEntity.getBody();
-                        logger.info("Value Received in Request - " + value);
-                        logger.info("Node Service Response - " + response);
-                        return Integer.parseInt(response);
-                }
-        }
+		@GetMapping("/increment/{value}")
+		public int increment(@PathVariable int value) {
+			ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseURL + '/' + value, String.class);
+			String response = responseEntity.getBody();
+			logger.info("Value Received in Request - " + value);
+			logger.info("Node Service Response - " + response);
+			return Integer.parseInt(response);
+		}
+	}
 
 }
