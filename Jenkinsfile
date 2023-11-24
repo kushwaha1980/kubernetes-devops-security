@@ -39,6 +39,15 @@ pipeline {
             }
         }
 
+        stage('Kubernetes Deployment - DEV') {
+            steps {
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    sh "sed -i 's#replace#$dockerImage#g' k8s_deployment_service.yaml"
+                    sh "kubectl apply -f k8s_deployment_service.yaml"
+                }
+            }
+        }
+
         stage('Remove Unused docker image') {
             steps{
                 sh "docker rmi $registry:$GIT_COMMIT"
