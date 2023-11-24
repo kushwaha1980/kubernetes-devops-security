@@ -42,8 +42,8 @@ pipeline {
         stage('Kubernetes Deployment - DEV') {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-		    echo 'image name: $dockerImage'
-                    sh "sed -i 's#replace#$dockerImage#g' k8s_deployment_service.yaml"
+                    echo "image name: $dockerImage"
+                    sh "sed -i "s#replace#$dockerImage#g" k8s_deployment_service.yaml"
                     sh "kubectl apply -f k8s_deployment_service.yaml"
                 }
             }
