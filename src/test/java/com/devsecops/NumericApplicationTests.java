@@ -58,4 +58,5 @@ public class NumericApplicationTests {
            .andExpect(content().string("51"));
     }
 
+
 }
