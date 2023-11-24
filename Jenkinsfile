@@ -43,7 +43,7 @@ pipeline {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
                     echo "image name: ${dockerImage}"
-                    sh "cat k8s_deployment_service.yaml|sed -i 's#replace#${dockerImage}#g'"
+                    sh "sed -i 's#replace#${registry}:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
                     sh "kubectl apply -f k8s_deployment_service.yaml"
                 }
             }
