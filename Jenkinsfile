@@ -32,7 +32,7 @@ pipeline {
                 script {
                     docker.withRegistry('', 'kumard31') {
                         sh 'printenv'
-                        dockerImage = docker.build registry + ":$GIT_COMMIT"
+                        def dockerImage = docker.build registry + ":$GIT_COMMIT"
                         dockerImage.push()
                     }
                 }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
                     echo "image name: ${dockerImage}"
-                    sh "sed -i 's#replace#${dockerImage}#g' k8s_deployment_service.yaml"
+                    sh "cat k8s_deployment_service.yaml|sed -i 's#replace#${dockerImage}#g'"
                     sh "kubectl apply -f k8s_deployment_service.yaml"
                 }
             }
