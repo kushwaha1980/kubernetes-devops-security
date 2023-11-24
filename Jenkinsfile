@@ -32,7 +32,7 @@ pipeline {
                 script {
                     docker.withRegistry('', 'kumard31') {
                         sh 'printenv'
-                        def dockerImage = docker.build registry + ":$GIT_COMMIT"
+                        dockerImage = docker.build registry + ":$GIT_COMMIT"
                         dockerImage.push()
                     }
                 }
