@@ -40,13 +40,23 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                sh "mvn clean verify sonar:sonar \
-                    -Dsonar.projectKey=devsecops-numeric-application \
-                    -Dsonar.projectName='devsecops-numeric-application' \
-                    -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000 \
-                    -Dsonar.token=sqp_d4126647a2a33635193cce29079df0e6ba25c4f1"
+                withSonarQubeEnv('sonarqube') {
+                    sh "mvn clean package sonar:sonar \
+                        -Dsonar.projectKey=devsecops-numeric-application \
+                        -Dsonar.projectName='devsecops-numeric-application' \
+                        -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000 \
+                        -Dsonar.token=sqp_d4126647a2a33635193cce29079df0e6ba25c4f1"
+                }
+
+                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                    if (qg.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
+                }
             }
         }
+
         stage ("docker build and push stage") {
             steps {
                 script {
