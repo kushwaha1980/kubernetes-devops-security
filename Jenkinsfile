@@ -40,7 +40,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv(credentialsId: 'jenkins-user', installationName: 'sonarqube') {
+                withSonarQubeEnv(credentialsId: 'sonar-auth', installationName: 'sonarqube') {
                 sh "mvn clean verify sonar:sonar -Dsonar.projectKey=numeric-app -Dsonar.projectName='numeric-app'"
                 }
             }
