@@ -44,8 +44,7 @@ pipeline {
                     sh "mvn clean package sonar:sonar \
                         -Dsonar.projectKey=devsecops-numeric-application \
                         -Dsonar.projectName='devsecops-numeric-application' \
-                        -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000 \
-                        -Dsonar.token=sqp_d4126647a2a33635193cce29079df0e6ba25c4f1"
+                        -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000"
                 }
 
                 timeout(time: 1, unit: 'HOURS') {
