@@ -8,7 +8,12 @@ pipeline {
     agent any
     
     stages {
-        
+        stage ("build artifacts") {
+            steps {
+                sh "mvn clean package -DskipTests=True"
+                archive "target/*.jar"
+            }
+        }
         stage('Unit Tests - JUnit and Jacoco') {
             steps {
                 sh "mvn test"
@@ -53,13 +58,6 @@ pipeline {
                         sh "bash trivy-docker-image-scan.sh"
                     }
                 )
-            }
-        }
-
-        stage ("build artifacts") {
-            steps {
-                sh "mvn clean package -DskipTests=True"
-                archive "target/*.jar"
             }
         }
 
