@@ -8,13 +8,7 @@ pipeline {
     agent any
     
     stages {
-        stage ("build artifacts") {
-            steps {
-                sh "mvn clean package -DskipTests=True"
-                archive "target/*.jar"
-            }
-        }
-
+        
         stage('Unit Tests - JUnit and Jacoco') {
             steps {
                 sh "mvn test"
@@ -48,7 +42,7 @@ pipeline {
                 }
             }
         }
-
+       
         stage('Vulnerability Scan - Docker ') {
             steps {
                 parallel(
@@ -62,6 +56,13 @@ pipeline {
             }
         }
 
+         stage ("build artifacts") {
+            steps {
+                sh "mvn clean package -DskipTests=True"
+                archive "target/*.jar"
+            }
+        }
+        
         stage ("docker build and push stage") {
             steps {
                 script {
