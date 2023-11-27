@@ -56,13 +56,13 @@ pipeline {
             }
         }
 
-         stage ("build artifacts") {
+        stage ("build artifacts") {
             steps {
                 sh "mvn clean package -DskipTests=True"
                 archive "target/*.jar"
             }
         }
-        
+
         stage ("docker build and push stage") {
             steps {
                 script {
