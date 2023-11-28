@@ -15,20 +15,12 @@ spec:
       labels:
         app: devsecops
     spec:
-      serviceAccountName: default
       containers:
       - image: replace
         name: devsecops-container
-        volumeMounts:
-        - mountPath: /tmp
-          name: vol
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
-          readOnlyRootFilesystem: true
-      volumes:
-      - name: cache-volume
-        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
