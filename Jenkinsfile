@@ -72,16 +72,21 @@ pipeline {
 
         stage ("docker build and push stage") {
             steps {
-                script {
-                    docker.withRegistry('', 'kumard31') {
-                        sh 'printenv'
-                        dockerImage = docker.build registry + ":$GIT_COMMIT"
-                        dockerImage.push()
-                    }
+                withDockerRegistry([credentialsId: 'kumard31', url: '']) {
+                    sh 'printenv'
+                    sh "sudo docker build -t ${registry}:${GIT_COMMIT} ."
+                    sh "docker push ${registry}:${GIT_COMMIT}"
                 }
             }
         }
 
+               // script {
+             //       docker.withRegistry('', 'kumard31') {
+               //         sh 'printenv'
+                 //       dockerImage = docker.build registry + ":$GIT_COMMIT"
+                   //     dockerImage.push()
+                    //}
+                //}
         stage('Vulnerability Scan - Kubernetes') {
             steps {
                 parallel(
