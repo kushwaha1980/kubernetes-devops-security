@@ -14,6 +14,7 @@ if [[ ! -z "${PORT}" ]];
 then
     response=$(curl -s ${applicationURL}:${PORT}${applicationURI})
     http_code=$(curl -s -o /dev/null -w "%{http_code}" ${applicationURL}:${PORT}${applicationURI})
+    sleep 10s
     echo "increment response: ${response}"
     echo "http response: ${http_code}"
 
