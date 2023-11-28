@@ -7,17 +7,17 @@ sleep 5s
 # serviceName="devsecops-svc"
 PORT=$(kubectl -n default get svc ${serviceName} -o json | jq .spec.ports[].nodePort)
 
-echo $PORT
-echo $applicationURL:$PORT$applicationURI
+echo ${PORT}
+echo ${applicationURL}:${PORT}${applicationURI}
 
-if [[ ! -z "$PORT" ]];
+if [[ ! -z "${PORT}" ]];
 then
-    response=$(curl -s $applicationURL:$PORT$applicationURI)
-    http_code=$(curl -s -o /dev/null -w "%{http_code}" $applicationURL:$PORT$applicationURI)
-    echo "increment response: $response"
-    echo "http response: $http_code"
+    response=$(curl -s ${applicationURL}:${PORT}${applicationURI})
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" ${applicationURL}:${PORT}${applicationURI})
+    echo "increment response: ${response}"
+    echo "http response: ${http_code}"
 
-    if [[ "$response" == 100 ]];
+    if [[ "${response}" == 100 ]];
     then
         echo "Increment test passed"
     else
@@ -25,7 +25,7 @@ then
         exit 1;
     fi;
 
-    if [[ "$http_code" == 200 ]];
+    if [[ "${http_code}" == 200 ]];
     then
         echo "HTTP code test passed"
     else
