@@ -116,6 +116,23 @@ pipeline {
             }
         }
 
+        stage('Integration testing - Dev') {
+            steps {
+                script {
+                    try {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "bash integration-test.sh"
+                        }
+                    } catch (e) {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "kubectl -n default rollout undo deploy ${deploymentName}"
+                        }
+                        throw e
+                    }
+                }
+            }
+        }
+
         stage('Remove Unused docker image') {
             steps{
                 sh "docker rmi $registry:$GIT_COMMIT"
