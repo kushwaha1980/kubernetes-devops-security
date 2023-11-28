@@ -138,11 +138,11 @@ pipeline {
             }
         }
 
-        stage('Remove Unused docker image') {
-            steps{
-                sh "docker rmi $registry:$GIT_COMMIT"
-            }
-        }
+        // stage('Remove Unused docker image') {
+        //     steps{
+        //         sh "docker rmi $registry:$GIT_COMMIT"
+        //     }
+        // }
 
     }
     post {
