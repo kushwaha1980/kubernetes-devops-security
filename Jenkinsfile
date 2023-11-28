@@ -75,7 +75,7 @@ pipeline {
                 script {
                     docker.withRegistry('', 'kumard31') {
                         sh 'printenv'
-                        dockerImage = docker.build "sudo" registry + ":$GIT_COMMIT"
+                        dockerImage = "sudo" docker.build registry + ":$GIT_COMMIT"
                         dockerImage.push()
                     }
                 }
