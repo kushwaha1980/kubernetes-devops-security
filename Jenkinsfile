@@ -8,7 +8,7 @@ pipeline {
         serviceName = "devsecops-svc"
         imageName = "kumard31/numeric-app:${GIT_COMMIT}"
         applicationURL = "http://mydevsecops.eastus.cloudapp.azure.com"
-        applicationURI = "/increment/99"
+        applicationURI = "increment/99"
     }
 
     agent any
