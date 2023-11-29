@@ -3,14 +3,14 @@
 #echo "$(kubectl -n default get svc ${serviceName})"
 
 
-#PORT=$(sudo kubectl -n default get svc ${serviceName} -o json | jq .spec.ports[].nodePort)
+PORT="$(sudo kubectl -n default get svc $serviceName -o json | jq .spec.ports[].nodePort)"
 
 # first run this
 sudo chmod 777 $(pwd)
 echo $(id -u):$(id -g)
-docker run -u 0 -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://mydevsecops.eastus.cloudapp.azure.com:30372/v3/api-docs -f openapi -r zap_report.html
+#docker run -u 0 -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://mydevsecops.eastus.cloudapp.azure.com:30372/v3/api-docs -f openapi -r zap_report.html
 
-#docker run -u 0 -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t $applicationURL:$PORT/v3/api-docs -f openapi -r zap_report.html
+"docker run -u 0 -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t $applicationURL:$PORT/v3/api-docs -f openapi -r zap_report.html"
 
 exit_code=$?
 
