@@ -138,6 +138,11 @@ pipeline {
             }
         }
 
+        stage('OWASP ZAP - DAST') {
+            steps {
+                sh 'bash zap.sh'
+            }
+        }
         // stage('Remove Unused docker image') {
         //     steps{
         //         sh "docker rmi $registry:$GIT_COMMIT"
@@ -150,6 +155,7 @@ pipeline {
             junit 'target/surefire-reports/*.xml'
             jacoco execPattern: 'target/jacoco.exec'
             dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Reports', reportTitles: 'OWASP ZAP HTML Reports', useWrapperFileDirectly: true])
         }
     }
 }
