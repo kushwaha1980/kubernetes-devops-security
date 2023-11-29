@@ -140,9 +140,7 @@ pipeline {
 
         stage('OWASP ZAP - DAST') {
             steps {
-                script {
-                    sh 'bash zap.sh'
-                }
+                sh "bash zap.sh"
             }
         }
         // stage('Remove Unused docker image') {
