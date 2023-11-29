@@ -3,7 +3,7 @@
 #echo "$(kubectl -n default get svc ${serviceName})"
 
 
-PORT=$(sudo kubectl -n default get svc ${serviceName} -o json | jq .spec.ports[].nodePort)
+PORT=$(sudo kubectl -n default get svc ${env.serviceName} -o json | jq .spec.ports[].nodePort)
 
 # first run this
 sudo chmod 777 $(pwd)
