@@ -1,3 +1,4 @@
+@Library('slack') _
 pipeline {
     environment {
         dockerImage = ''
@@ -14,148 +15,155 @@ pipeline {
     agent any
     
     stages {
-        stage ("build artifacts") {
-            steps {
-                sh "mvn clean package -DskipTests=True"
-                archive "target/*.jar"
-            }
-        }
-        stage('Unit Tests - JUnit and Jacoco') {
-            steps {
-                sh "mvn test"
-            }
-        }
-
-        stage('Mutation Tests - PIT') {
-            steps {
-                sh "mvn org.pitest:pitest-maven:mutationCoverage"
-            }
-
-            post {
-                always {
-                    pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
-                }
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh "mvn clean package sonar:sonar \
-                        -Dsonar.projectKey=devsecops-numeric-application \
-                        -Dsonar.projectName='devsecops-numeric-application' \
-                        -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000"
-                }
-
-                timeout(time: 1, unit: 'HOURS') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-       
-        stage('Vulnerability Scan - Docker ') {
-            steps {
-                parallel(
-                    "Dependency Scan": {
-                        sh "mvn dependency-check:check"
-                    },
-                    "Trivy Scan": {
-                        sh "bash trivy-docker-image-scan.sh"
-                    },
-                    "OPA Conftest": {
-                        sh "/usr/local/bin/conftest test --policy opa-docker-security.rego Dockerfile"
-                    }
-                )
-            }
-        }
-
-        stage ("docker build and push stage") {
-            steps {
-                withDockerRegistry([credentialsId: 'kumard31', url: '']) {
-                    sh 'printenv'
-                    sh "sudo docker build -t ${registry}:${GIT_COMMIT} ."
-                    sh "docker push ${registry}:${GIT_COMMIT}"
-                }
-            }
-        }
-
-               // script {
-             //       docker.withRegistry('', 'kumard31') {
-               //         sh 'printenv'
-                 //       dockerImage = docker.build registry + ":$GIT_COMMIT"
-                   //     dockerImage.push()
-                    //}
-                //}
-        stage('Vulnerability Scan - Kubernetes') {
-            steps {
-                parallel(
-                    "OPA Scan": {
-                        sh '/usr/local/bin/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
-                    },
-                    "Kubesec Scan": {
-                        sh "bash kubesec-scan.sh"
-                    },
-                    "Trivy Scan": {
-                        sh "bash trivy-k8s-scan.sh"
-                    }
-                )
-            }
-        }
-
-        stage('Kubernetes Deployment - DEV') {
-            steps {
-                parallel(
-                    "Deployment": {
-                        withKubeConfig([credentialsId: 'kubeconfig']) {
-                            sh "bash k8s-deployment.sh"
-                        
-                        }
-                    },
-                    "Rollout-status": {
-                        withKubeConfig([credentialsId: 'kubeconfig']) {
-                            sh "bash k8s-deployment-rollout-status.sh"
-                        }
-                    }
-                )
-            }
-        }
-
-        stage('Integration testing - Dev') {
-            steps {
-                script {
-                    try {
-                        withKubeConfig([credentialsId: 'kubeconfig']) {
-                            sh "bash integration-test.sh"
-                        }
-                    } catch (e) {
-                        withKubeConfig([credentialsId: 'kubeconfig']) {
-                            sh "kubectl -n default rollout undo deploy ${deploymentName}"
-                        }
-                        throw e
-                    }
-                }
-            }
-        }
-
-        stage('OWASP ZAP - DAST') {
-            steps {
-                sh "bash zap.sh"
-            }
-        }
-        // stage('Remove Unused docker image') {
-        //     steps{
-        //         sh "docker rmi $registry:$GIT_COMMIT"
+        // stage ("build artifacts") {
+        //     steps {
+        //         sh "mvn clean package -DskipTests=True"
+        //         archive "target/*.jar"
         //     }
         // }
+        // stage('Unit Tests - JUnit and Jacoco') {
+        //     steps {
+        //         sh "mvn test"
+        //     }
+        // }
+
+        // stage('Mutation Tests - PIT') {
+        //     steps {
+        //         sh "mvn org.pitest:pitest-maven:mutationCoverage"
+        //     }
+
+        //     post {
+        //         always {
+        //             pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+        //         }
+        //     }
+        // }
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('sonarqube') {
+        //             sh "mvn clean package sonar:sonar \
+        //                 -Dsonar.projectKey=devsecops-numeric-application \
+        //                 -Dsonar.projectName='devsecops-numeric-application' \
+        //                 -Dsonar.host.url=http://mydevsecops.eastus.cloudapp.azure.com:9000"
+        //         }
+
+        //         timeout(time: 1, unit: 'HOURS') {
+        //             // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+        //             // true = set pipeline to UNSTABLE, false = don't
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
+       
+        // stage('Vulnerability Scan - Docker ') {
+        //     steps {
+        //         parallel(
+        //             "Dependency Scan": {
+        //                 sh "mvn dependency-check:check"
+        //             },
+        //             "Trivy Scan": {
+        //                 sh "bash trivy-docker-image-scan.sh"
+        //             },
+        //             "OPA Conftest": {
+        //                 sh "/usr/local/bin/conftest test --policy opa-docker-security.rego Dockerfile"
+        //             }
+        //         )
+        //     }
+        // }
+
+        // stage ("docker build and push stage") {
+        //     steps {
+        //         withDockerRegistry([credentialsId: 'kumard31', url: '']) {
+        //             sh 'printenv'
+        //             sh "sudo docker build -t ${registry}:${GIT_COMMIT} ."
+        //             sh "docker push ${registry}:${GIT_COMMIT}"
+        //         }
+        //     }
+        // }
+
+        //        // script {
+        //      //       docker.withRegistry('', 'kumard31') {
+        //        //         sh 'printenv'
+        //          //       dockerImage = docker.build registry + ":$GIT_COMMIT"
+        //            //     dockerImage.push()
+        //             //}
+        //         //}
+        // stage('Vulnerability Scan - Kubernetes') {
+        //     steps {
+        //         parallel(
+        //             "OPA Scan": {
+        //                 sh '/usr/local/bin/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
+        //             },
+        //             "Kubesec Scan": {
+        //                 sh "bash kubesec-scan.sh"
+        //             },
+        //             "Trivy Scan": {
+        //                 sh "bash trivy-k8s-scan.sh"
+        //             }
+        //         )
+        //     }
+        // }
+
+        // stage('Kubernetes Deployment - DEV') {
+        //     steps {
+        //         parallel(
+        //             "Deployment": {
+        //                 withKubeConfig([credentialsId: 'kubeconfig']) {
+        //                     sh "bash k8s-deployment.sh"
+                        
+        //                 }
+        //             },
+        //             "Rollout-status": {
+        //                 withKubeConfig([credentialsId: 'kubeconfig']) {
+        //                     sh "bash k8s-deployment-rollout-status.sh"
+        //                 }
+        //             }
+        //         )
+        //     }
+        // }
+
+        // stage('Integration testing - Dev') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 withKubeConfig([credentialsId: 'kubeconfig']) {
+        //                     sh "bash integration-test.sh"
+        //                 }
+        //             } catch (e) {
+        //                 withKubeConfig([credentialsId: 'kubeconfig']) {
+        //                     sh "kubectl -n default rollout undo deploy ${deploymentName}"
+        //                 }
+        //                 throw e
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('OWASP ZAP - DAST') {
+        //     steps {
+        //         sh "bash zap.sh"
+        //     }
+        // }
+        // // stage('Remove Unused docker image') {
+        // //     steps{
+        // //         sh "docker rmi $registry:$GIT_COMMIT"
+        // //     }
+        // // }
+
+        stage('Slack -testing') {
+            steps {
+                sh "exit 0"
+            }
+        }
 
     }
     post {
         always {
-            junit 'target/surefire-reports/*.xml'
-            jacoco execPattern: 'target/jacoco.exec'
-            dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Reports', reportTitles: 'OWASP ZAP HTML Reports', useWrapperFileDirectly: true])
+            // junit 'target/surefire-reports/*.xml'
+            // jacoco execPattern: 'target/jacoco.exec'
+            // dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+            // publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Reports', reportTitles: 'OWASP ZAP HTML Reports', useWrapperFileDirectly: true])
+            slackNotification currentBuild.result
         }
     }
 }
