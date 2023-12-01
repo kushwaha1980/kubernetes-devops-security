@@ -147,7 +147,7 @@ pipeline {
 
         stage('Promote to Prod') {
             steps {
-                timeout(time: 2, unit'DAYS') {
+                timeout(time: 2, unit: 'DAYS') {
                     input 'Do you want to approve the deployment to prod env/namespace?'
                 }
             }
