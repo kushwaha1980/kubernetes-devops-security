@@ -146,15 +146,31 @@ pipeline {
         }
 
         stage('Promote to Prod') {
-            agent{
-                label "controlplane"
-            }
             steps {
-                sh 'bash cis-etcd.sh'
-                sh 'bash cis-master.sh'
-                sh 'bash cis-node.sh'
+                timeout(time: 2, unit'DAYS') {
+                    input 'Do you want to approve the deployment to prod env/namespace?'
+                }
             }
         }
+
+        stage('k8s-CIS Benchmark') {
+            steps {
+                script {
+                    parallel(
+                        "Master": {
+                            sh 'bash cis-master.sh'
+                        },
+                        "etcd": {
+                            sh 'bash cis-etcd.sh'
+                        },
+                        "Kubelet": {
+                            sh 'bash cis-node.sh'
+                        }
+                    )
+                }
+            }
+        }
+      
         // stage('Remove Unused docker image') {
         //     steps{
         //         sh "docker rmi $registry:$GIT_COMMIT"
