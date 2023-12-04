@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: node-app
+  name: node-app
+  namespace: devsecops-istio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: siddharth67/node-service:v1
+          env:
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: node-service
+  name: node-service
+  namespace: devsecops-istio
+spec:
+  ports:
+    - name: node
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+      nodePort: 30011
+  selector:
+    app: node-app
+  type: NodePort

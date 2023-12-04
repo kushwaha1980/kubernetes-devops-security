@@ -170,7 +170,26 @@ pipeline {
                 }
             }
         }
-      
+
+        stage('Kubernetes Deployment - Prod') {
+            steps {
+                parallel(
+                    "Deployment": {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "sed -i 's#replace#${imageName}#g' k8s_prod_service.yaml"
+                            sh "kubectl -n devsecops-istio apply -f k8s_prod_service.yaml"
+                        
+                        }
+                    },
+                    "Rollout-status": {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "bash k8s-prod-rollout-status.sh"
+                        }
+                    }
+                )
+            }
+        }
+
         // stage('Remove Unused docker image') {
         //     steps{
         //         sh "docker rmi $registry:$GIT_COMMIT"
