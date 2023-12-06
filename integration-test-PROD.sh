@@ -6,7 +6,7 @@ sleep 5s
 # echo "ok"
 echo "with curly braces: ${serviceName}"
 echo "without curly braces: $serviceName"
-PORT=$(kubectl -n devsecops-istio get svc ${serviceName} -o json | jq .spec.ports[].nodePort)
+PORT=$(kubectl -n devsecops-istio get svc "${serviceName}" -o json | jq .spec.ports[].nodePort)
 ### Istio Ingress Gateway Port 80 - NodePort
 #PORT=$(kubectl -n istio-system get svc istio-ingressgateway -o json | jq '.spec.ports[] | select(.port == 80)' | jq .nodePort)
 
