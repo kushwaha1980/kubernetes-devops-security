@@ -12,6 +12,8 @@ PORT=$(kubectl -n devsecops-istio get svc "${serviceName}" -o json | jq .spec.po
 
 
 echo $PORT
+
+PORT="30704"
 echo $applicationURL:$PORT$applicationURI
 
 if [[ ! -z "$PORT" ]];
