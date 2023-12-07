@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-12-05T14:10:25Z"
+  generateName: falco-falcosidekick-ui-redis-
+  labels:
+    app.kubernetes.io/instance: falco-ui-redis
+    app.kubernetes.io/name: falcosidekick-ui-redis
+    controller-revision-hash: falco-falcosidekick-ui-redis-7b56bcbf9c
+    statefulset.kubernetes.io/pod-name: falco-falcosidekick-ui-redis-0
+  name: falco-falcosidekick-ui-redis-0
+  namespace: falco
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: falco-falcosidekick-ui-redis
+    uid: f4ed352a-2d64-4290-817f-9b86db99e6b3
+  resourceVersion: "16360"
+  uid: a3e63249-634b-4052-9c1f-14a1193ea5c1
+spec:
+  containers:
+  - image: docker.io/redislabs/redisearch:2.2.4
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      tcpSocket:
+        port: 6379
+      timeoutSeconds: 2
+    name: redis
+    ports:
+    - containerPort: 6379
+      name: redis
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      tcpSocket:
+        port: 6379
+      timeoutSeconds: 2
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-dgpfr
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: falco-falcosidekick-ui-redis-0
+  nodeName: controlplane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: falco-falcosidekick-ui
+  serviceAccountName: falco-falcosidekick-ui
+  subdomain: falco-falcosidekick-ui-redis
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-dgpfr
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-05T14:10:26Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-05T14:10:46Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-05T14:10:46Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-05T14:10:26Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://914d5310fe407a127fac0e7feaf48a25ca3ecb741f3c918258122e541121af9f
+    image: redislabs/redisearch:2.2.4
+    imageID: docker-pullable://redislabs/redisearch@sha256:11a1342e754b593b7e8e2d8736b0a598f00b70fa8b42a6863fa738653e85eb49
+    lastState: {}
+    name: redis
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-12-05T14:10:37Z"
+  hostIP: 192.168.121.102
+  phase: Running
+  podIP: 10.50.0.8
+  podIPs:
+  - ip: 10.50.0.8
+  qosClass: BestEffort
+  startTime: "2023-12-05T14:10:26Z"

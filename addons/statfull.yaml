@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    meta.helm.sh/release-name: falco
+    meta.helm.sh/release-namespace: falco
+  creationTimestamp: "2023-12-05T14:10:25Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: falco-ui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: falcosidekick-ui-redis
+    helm.sh/chart: falcosidekick-1
+  name: falco-falcosidekick-ui-redis
+  namespace: falco
+  resourceVersion: "16363"
+  uid: f4ed352a-2d64-4290-817f-9b86db99e6b3
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: falco-ui-redis
+      app.kubernetes.io/name: falcosidekick-ui-redis
+  serviceName: falco-falcosidekick-ui-redis
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: falco-ui-redis
+        app.kubernetes.io/name: falcosidekick-ui-redis
+    spec:
+      containers:
+      - image: docker.io/redislabs/redisearch:2.2.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 6379
+          timeoutSeconds: 2
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 6379
+          timeoutSeconds: 2
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: falco-falcosidekick-ui
+      serviceAccountName: falco-falcosidekick-ui
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: falco-falcosidekick-ui-redis-7b56bcbf9c
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: falco-falcosidekick-ui-redis-7b56bcbf9c
+  updatedReplicas: 1

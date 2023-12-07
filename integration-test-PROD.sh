@@ -13,7 +13,7 @@ PORT=$(kubectl -n devsecops-istio get svc "${serviceName}" -o json | jq .spec.po
 
 echo $PORT
 
-PORT="32288"
+#PORT="32288"
 echo $applicationURL:$PORT$applicationURI
 
 if [[ ! -z "$PORT" ]];
@@ -21,6 +21,7 @@ then
 
     response=$(curl -s $applicationURL:$PORT$applicationURI)
     http_code=$(curl -s -o /dev/null -w "%{http_code}" $applicationURL:$PORT$applicationURI)
+    sleep 30
 
     if [[ "$response" == 100 ]];
         then
